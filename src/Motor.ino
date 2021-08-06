@@ -20,18 +20,16 @@ uint32_t targetTime = 0;       // for next 1 second timeout
 TTGOClass *ttgo;
 
 /* ------------------ WIFI LOGIN ------------------- */
-// const char* ssid = "AndrewP";
-// const char* password = "A5PANG6465929498";
-// const char* ssid = "BTIA_JEJ1SGP";
-// const char* password = "4OoMHjCVIjnU";
-const char* ssid = "isthiskrustykrab";
-const char* password = "nothisispatrick";
+const char* ssid = "BTIA_JEJ1SGP";
+const char* password = "4OoMHjCVIjnU";
+// const char* ssid = "{SSID OF WIFI}";
+// const char* password = "{PASSWORD}";
 
 
 /* ------------------ MQTT IP ADDRESS ------------------- */
 // const char* mqtt_server = "192.168.0.151";
-// const char* mqtt_server = "192.168.88.221";
-const char* mqtt_server = "192.168.43.182";
+const char* mqtt_server = "192.168.88.221";
+// const char* mqtt_server = "192.168.43.182";
 
 /* ------------------ Wifi + MQTT inits ------------------- */
 WiFiClient espClient;
@@ -40,6 +38,8 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 int deg = -180;
+long now = 0;
+String lastMessage = " ";
 
 
 
@@ -270,14 +270,20 @@ void callback(char* topic, byte* message, unsigned int length) {
     Serial.println();
 
     /*-------------LOGIC--------------*/
+    if (messageTemp == lastMessage)
+        return;
     if (messageTemp == "1") {
         ttgo->motor->onec(1000);
         drawbigX(1000);
-        delay(200);
-    } else {
+        // delay(200);
+        // }
+    } else if (messageTemp == "0") {
         drawGreenTick(1000);
-        delay(200);
+            // delay(200);
+        // }
+
     }
+    lastMessage = messageTemp;
     /*--------- TEXT -----------*/
     ttgo->tft->fillScreen(TFT_BLACK);
     ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
@@ -320,10 +326,10 @@ void loop()
         reconnect();
     }
     client.loop();
-    long now = millis();
-    if(now - lastMsg > 5000) {
-        lastMsg = now;
-    }
+    now = millis();
+    // if(now - lastMsg > 5000) {
+    //     lastMsg = now;
+    // }
     HMI_Display();
     // if (digitalRead(TP_INT) == LOW) {
     //     ttgo->motor->onec();
